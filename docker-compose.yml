@@ -1,19 +1,24 @@
-version: '3.8'
 services:
   db:
+    # Aurora for MySQL 8.0 のデフォルト認証プラグインは mysql_native_password のため、それに合わせる
+    # 参考: https://dev.classmethod.jp/articles/rds-mysql-8-default-auth-plugin-is-mysql_native_password/
+    command: --default-authentication-plugin=mysql_native_password
     image: mysql:8.0
     container_name: mysql_training
     restart: always
     environment:
+      MYSQL_DATABASE: tachyon
       MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: training_db
       MYSQL_USER: training_user
       MYSQL_PASSWORD: password
     ports:
       - "3306:3306"
     volumes:
-      - db_data:/var/lib/mysql
-      - ./SQL/test.sql:/docker-entrypoint-initdb.d/test.sql
+      - ./database/tachyon/01_create_db.sql:/docker-entrypoint-initdb.d/1.sql
+      - ./database/tachyon/02_create_data.sql:/docker-entrypoint-initdb.d/2.sql
+      - ./database/tutorial/tutorial.sql:/docker-entrypoint-initdb.d/3.sql
+      - ./database/employees/employees.sql:/docker-entrypoint-initdb.d/4.sql
+      - ./database/employees/dump:/tmp/dump
 
 volumes:
   db_data:
